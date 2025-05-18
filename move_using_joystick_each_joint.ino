@@ -1,5 +1,5 @@
-const int dirPins[6] = {24, 28, 22, 14, 13, 36};  // Direction control pins
-const int pwmPins[6] = {25, 29, 23, 15, 37, 33}; // PWM control pins
+const int dirPins[6] = {9, 11, 24, 28, 37, 35};  // Direction control pins
+const int pwmPins[6] = {10, 12, 25, 29, 36, 33}; // PWM control pins
 
 float jointVals[6];
 
