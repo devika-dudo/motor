@@ -7,8 +7,8 @@ const int dirPins[6] = {9, 11, 24, 28, 37, 35};  // Direction control pins
 const int pwmPins[6] = {10, 12, 25, 29, 36, 33}; // PWM control pins  
 
 // Encoder pins (A channels must be interrupt-capable)
-const int encoderAPins[6] = {1, 3, 5, 7, 41,39}; // Interrupt pins
-const int encoderBPins[6] = {2, 4, 6, 8, 40,38}; // Digital pins
+const int encoderAPins[6] = {1, 3, 5, 7, 41,22}; // Interrupt pins
+const int encoderBPins[6] = {2, 4, 6, 8, 40,23}; // Digital pins
 
 // --- Motor and Encoder Variables ---
 volatile long encoderCounts[6] = {0, 0, 0, 0, 0, 0};
@@ -23,10 +23,10 @@ long previousErrors[6] = {0, 0, 0, 0, 0, 0};
 float integrals[6] = {0, 0, 0, 0, 0, 0};
 
 // --- Movement Control Parameters ---
-const int maxSpeed = 255;       // Max motor PWM
+const int maxSpeed = 80;       // Max motor PWM
 const int minSpeed = 60;        // Minimum speed to overcome inertia
 const int stopThreshold = 2;    // How close to target before stopping
-const unsigned long moveTimeout = 10000; // Timeout in ms for movements
+const unsigned long moveTimeout = 100000; // Timeout in ms for movements
 
 // Targets for each motor
 long motorTargets[6] = {0, 0, 0, 0, 0, 0};
@@ -370,3 +370,4 @@ void loop() {
   
   delay(10); // Control loop timing
 }
+
