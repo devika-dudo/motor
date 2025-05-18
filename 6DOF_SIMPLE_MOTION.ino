@@ -3,12 +3,12 @@
 
 // --- Pin Definitions ---
 // Motor control pins (direction and PWM)
-const int dirPins[6] = {24, 28, 22, 14, 13, 36};  // Direction control pins
-const int pwmPins[6] = {25, 29, 23, 15, 37, 33}; // Speed control pins
+const int dirPins[6] = {9, 11, 24, 28, 37, 35};  // Direction control pins
+const int pwmPins[6] = {10, 12, 25, 29, 36, 33}; // PWM control pins  
 
 // Encoder pins (A channels must be interrupt-capable)
-const int encoderAPins[6] = {1, 3, 5, 7, 9, 11}; // Interrupt pins
-const int encoderBPins[6] = {2, 4, 6, 8, 10, 12}; // Digital pins
+const int encoderAPins[6] = {1, 3, 5, 7, 41,39}; // Interrupt pins
+const int encoderBPins[6] = {2, 4, 6, 8, 40,38}; // Digital pins
 
 // --- Motor and Encoder Variables ---
 volatile long encoderCounts[6] = {0, 0, 0, 0, 0, 0};
