@@ -8,8 +8,16 @@ pygame.joystick.init()
 joystick = pygame.joystick.Joystick(0)
 joystick.init()
 
-ser = serial.Serial('/dev/ttyACM0', 9600)  # adjust to your port
-time.sleep(2)  # Give some time for Arduino to reset
+print(f"[INFO] Joystick detected: {joystick.get_name()}")
+
+# Try to connect to Arduino
+try:
+    ser = serial.Serial('/dev/ttyACM0', 9600)  # Change port if needed
+    time.sleep(2)  # Allow Arduino to reset
+    print("[INFO] Connected to Arduino.")
+except serial.SerialException:
+    print("[ERROR] Could not connect to Arduino on /dev/ttyACM0.")
+    ser = None
 
 # Button indices
 BUTTON_A = 0
@@ -36,6 +44,7 @@ while True:
     for button, mode in button_to_mode.items():
         if joystick.get_button(button):
             current_mode = mode
+            print(f"[INFO] Switched to mode {current_mode} (controlling joints {current_mode*2} and {current_mode*2 + 1})")
 
     joint_values = [0.0] * 6
 
@@ -49,5 +58,13 @@ while True:
 
     # Convert to string and send
     msg = " ".join(f"{val:.2f}" for val in joint_values) + "\n"
-    ser.write(msg.encode())
+    
+    # Print feedback
+    print(f"[SEND] {msg.strip()}")
+
+    # Send only if serial is connected
+    if ser:
+        ser.write(msg.encode())
+
     time.sleep(0.05)
+
