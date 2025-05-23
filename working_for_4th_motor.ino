@@ -28,10 +28,10 @@ const int stopThreshold = 2;
 
 // Lookup table for quadrature decoding
 const int8_t lookupTable[16] = {
-   0, -1, +1, 0,
-  1, 0, 0, +1,
-   -1, 0, 0, +1,
-   0, 1, -1, 0
+   0, +1, -1, 0,
+  -1, 0, 0, -1,
+   +1, 0, 0, -1,
+   0, -1, 1, 0
 };
 
 void IRAM_ATTR encoderISR() {
@@ -162,3 +162,4 @@ void moveTicks(long target) {
     delay(10);
   }
 }
+
