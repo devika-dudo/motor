@@ -21,7 +21,7 @@ const int pwmChannels[6] = {0, 1, 2, 3, 4, 5}; // PWM channels for each motor
 
 // --- Motor and Encoder Variables ---
 volatile long encoderCounts[6] = {0, 0, 0, 0, 0, 0};
-bool invertEncoderCounting[6] = {false, true, false, false, false, false};
+bool invertEncoderCounting[6] = {false, false, true, false, false, false};
 
 // --- PID Control Constants ---
 // These should be tuned for your specific motors and application
@@ -64,7 +64,7 @@ void IRAM_ATTR encoderISR5() { updateEncoder(5); }
 void IRAM_ATTR updateEncoder(int motorIndex) {
   bool countUp = digitalRead(encoderBPins[motorIndex]) == HIGH;
   if (invertEncoderCounting[motorIndex]) countUp = !countUp;
-  encoderCounts[motorIndex] += countUp ? 1 : -1;
+  encoderCounts[motorIndex] += countUp ? -1 : 1;
 }
 
 // Function pointer array for ISRs
@@ -117,10 +117,12 @@ void updateMotorControl(int motorIndex) {
   // Check if we've reached the target
   if (abs(error) <= stopThreshold) {
     stopMotor(motorIndex);
+    delay(50);  // Allow physical system to settle
+    long actualReached = encoderCounts[motorIndex];
     Serial.print("Motor ");
     Serial.print(motorIndex);
     Serial.print(" reached target: ");
-    Serial.println(encoderCounts[motorIndex]);
+    Serial.println(actualReached);
     return;
   }
   
@@ -137,7 +139,7 @@ void updateMotorControl(int motorIndex) {
   outputSpeed = constrain(outputSpeed, minSpeed, maxSpeed);
   
   // Set direction
-  digitalWrite(dirPins[motorIndex], error > 0 ? HIGH : LOW);
+  digitalWrite(dirPins[motorIndex], error > 0 ? LOW : HIGH);
   
   // Apply speed using ESP32's ledcWrite
   ledcWrite(pwmPins[motorIndex], outputSpeed);
@@ -423,4 +425,4 @@ void loop() {
   }
   
   delay(10); // Control loop timing
-
+}
