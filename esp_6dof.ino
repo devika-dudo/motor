@@ -3,12 +3,16 @@
 
 // --- Pin Definitions ---
 // Motor control pins (direction and PWM)
-const int dirPins[6] = {32, 26, 27, 14, 12, 13};  // Direction control pins
-const int pwmPins[6] = {25, 33, 4, 16, 17, 5};    // PWM control pins  
+// --- Pin Definitions ---
+// Motor control pins (direction and PWM) - Fixed pin assignments
+const int dirPins[6] = {19, 26, 27, 14, 12, 13};     // Direction control pins
+const int pwmPins[6] = {18, 25, 33, 32, 5, 22};     // PWM control pins - NO CONFLICTS
 
-// Encoder pins (A channels must be interrupt-capable)
-const int encoderAPins[6] = {34, 35, 36, 39, 18, 19}; // Interrupt pins (input only)
-const int encoderBPins[6] = {21, 22, 23, 2, 15, 4};   // Digital pins
+// Encoder pins - FIXED assignments with no conflicts
+// A channels must be interrupt-capable, avoiding input-only pins
+const int encoderAPins[6] = {2, 4, 16, 21, 17, 23};   // Interrupt-capable pins
+const int encoderBPins[6] = {15, 34, 35, 23, 22, 0}; // Digital pins (34-39 are input-only, that's OK for B pins)
+
 
 // --- PWM Configuration ---
 const int pwmFreq = 1000;      // PWM frequency (Hz)
@@ -17,7 +21,7 @@ const int pwmChannels[6] = {0, 1, 2, 3, 4, 5}; // PWM channels for each motor
 
 // --- Motor and Encoder Variables ---
 volatile long encoderCounts[6] = {0, 0, 0, 0, 0, 0};
-bool invertEncoderCounting[6] = {true, true, false, false, false, false};
+bool invertEncoderCounting[6] = {false, true, false, false, false, false};
 
 // --- PID Control Constants ---
 // These should be tuned for your specific motors and application
@@ -69,7 +73,7 @@ ISRFunction encoderISRs[6] = {encoderISR0, encoderISR1, encoderISR2, encoderISR3
 
 // --- Motor Control Functions ---
 void stopMotor(int motorIndex) {
-  ledcWrite(pwmChannels[motorIndex], 0);
+  ledcWrite(pwmPins[motorIndex], 0);
   motorMoving[motorIndex] = false;
 }
 
@@ -136,7 +140,7 @@ void updateMotorControl(int motorIndex) {
   digitalWrite(dirPins[motorIndex], error > 0 ? HIGH : LOW);
   
   // Apply speed using ESP32's ledcWrite
-  ledcWrite(pwmChannels[motorIndex], outputSpeed);
+  ledcWrite(pwmPins[motorIndex], outputSpeed);
 }
 
 // --- Command Processing Functions ---
@@ -267,17 +271,17 @@ void parseCommand(String command) {
       }
     }
     else if (cmd.equalsIgnoreCase("SET") && argCount >= 7) {
-      // SET <pwm1> <pwm2> <pwm3> <pwm4> <pwm5> <pwm6>
-      for (int i = 0; i < 6; i++) {
-        int pwmValue = cmdArgs[i+1].toInt();
-        // Positive values: forward, Negative values: backward
-        digitalWrite(dirPins[i], pwmValue >= 0 ? HIGH : LOW);
-        ledcWrite(pwmChannels[i], constrain(abs(pwmValue), 0, maxSpeed));
-        // Stop PID control for this motor
-        motorMoving[i] = false;
-      }
-      Serial.println("OK");
-    }
+  for (int i = 0; i < 6; i++) {
+    int pwmValue = cmdArgs[i+1].toInt();
+    Serial.print("Motor "); Serial.print(i); // Debug
+    Serial.print(": Dir="); Serial.print(pwmValue >= 0 ? "HIGH" : "LOW");
+    Serial.print(", PWM="); Serial.println(constrain(abs(pwmValue), 0, maxSpeed));
+    digitalWrite(dirPins[i], pwmValue >= 0 ? HIGH : LOW);
+    ledcWrite(pwmPins[i], constrain(abs(pwmValue), 0, maxSpeed));
+    motorMoving[i] = false;
+  }
+  Serial.println("OK");
+}
     else if (cmd.equalsIgnoreCase("STATUS")) {
       // Print status information for all motors
       for (int i = 0; i < 6; i++) {
@@ -419,4 +423,4 @@ void loop() {
   }
   
   delay(10); // Control loop timing
-}
+
