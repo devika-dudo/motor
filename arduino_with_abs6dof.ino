@@ -3,8 +3,8 @@
 
 // --- Pin Definitions ---
 // Motor control pins (direction and PWM)
-const int dirPins[6] = {9, 11, 24, 28, 37, 35};  // Direction control pins
-const int pwmPins[6] = {10, 12, 25, 29, 36, 33}; // PWM control pins  
+const int dirPins[6] = {1, 3, 24, 28, 37, 35};  // Direction control pins
+const int pwmPins[6] = {2, 4, 25, 29, 36, 33}; // PWM control pins  
 
 // Encoder pins (A channels must be interrupt-capable)
 const int encoderAPins[6] = {19, 1, 22, 14, 41, 6}; // Interrupt pins
