@@ -64,7 +64,7 @@ const long COUNTS_PER_REV[NUM_MOTORS] = {
 const int ENCODER_DIRECTION[NUM_MOTORS] = {
   1,   // Motor 1: 1=normal, -1=reversed
   1,   // Motor 2
-  1,   // Motor 3
+  -1,   // Motor 3
   1,   // Motor 4
   1,   // Motor 5
   1    // Motor 6
@@ -159,9 +159,7 @@ float countsToAngle(long counts, int motor_idx) {
   // Apply encoder direction inversion
   float angle = (counts * 360.0) / COUNTS_PER_REV[motor_idx];
   angle=angle * ENCODER_DIRECTION[motor_idx];
-  if (motor_idx == 2) {  
-    angle = abs(angle);  // Always positive!
-  }
+
   return angle;
 }
 
@@ -176,7 +174,7 @@ void joint_command_callback(const void * msgin) {
     
     // NO INVERSION HERE - keep target as-is
     if (i == 2) {  // Joint 3 (0-indexed)
-    new_target = abs(new_target);
+    new_target = new_target*-1;
   }
     if (abs(new_target - motors[i].target_angle) > 0.1) {
       motors[i].target_angle = new_target;
